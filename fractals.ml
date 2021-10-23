@@ -174,3 +174,46 @@ vicsek_croix 5;;
 vicsek_etoile 5;;
 
 (* 2.3.5 - Mandelbrot *)
+
+#open Complex;;
+
+let mandelbrot =
+  clear_graph() ;
+  let xmin = (-2.)
+  and ymin = (-2.)
+  and xmax = 2.
+  and ymax = 2.
+  and width = 500.
+  and height = 500.
+  and iterations = 200
+  and contrast = 5
+  in let set_plot_color z = (* Set the color of each point.*)
+       let rec suite v i =
+         if i > iterations then i
+         else (
+           if Complex.norm v > 2. then (
+             i
+           )
+           else (
+             suite (Complex.add (Complex.mul v v) z) (i + 1)
+           )
+         )
+       in let n = suite Complex.zero 0
+          in if n > iterations then set_color (rgb 147 112 219) 
+             else set_color (rgb (230 - contrast * n) (232 - contrast * n) (250 - contrast * n))
+     in let rec draw_line py = (* Draws each line. *)
+          if py < (int_of_float height) then (
+            let y = ((float_of_int py) /. height *. (ymax -. ymin) +. ymin)
+            in let rec draw_plot px = (* Draws each point of the line. *)
+                 if px < (int_of_float width) then (
+                   let x = ((float_of_int px) /. width *. (xmax -. xmin) +. xmin)
+                   in let z = {re = x; im = y}
+                      in set_plot_color z ;
+                         plot px py ;
+                         draw_plot (px + 1)
+                 )
+               in draw_plot 0 ;
+                  draw_line (py + 1)
+          )
+        in draw_line 0
+;;
